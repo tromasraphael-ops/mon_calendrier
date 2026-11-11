@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mon calendrier</title>
+
+    <style>
+
+        /* Apparence générale */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 15px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a4091, #16213e);
+        }
+
+        /* Titre */
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        header p {
+            margin-top: 0;
+            color: #dce6f5;
+        }
+
+        /* Formulaire */
+        main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        form {
+            background-color: white;
+            padding: 35px;
+            border-radius: 15px;
+            width: 300px;
+            max-width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #0a4091;
+        }
+
+        /* Bouton */
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0a4091;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #062c68;
+            transform: scale(1.03);
+        }
+
+        /* Résultat */
+        .resultat {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+
+        .resultat h2 {
+            text-align: center;
+            color: #0a4091;
+        }
+
+        /* Tableau du calendrier */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th {
+            background-color: #0a4091;
+            color: white;
+            padding: 10px 2px;
+            font-size: 13px;
+        }
+
+        td {
+            text-align: center;
+            padding: 12px 2px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        td.aujourd-hui {
+            background-color: #dceaff;
+            color: #0a4091;
+            font-weight: bold;
+            border: 2px solid #0a4091;
+        }
+
+        /* Message d'erreur */
+        .erreur {
+            color: #c62828;
+            text-align: center;
+        }
+
+        /* Adaptation téléphone */
+        @media (max-width: 400px) {
+            .resultat {
+                padding: 12px;
+            }
+
+            td {
+                padding: 9px 1px;
+            }
+
+            th {
+                font-size: 11px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Mon calendrier</h1>
+        <p>Choisis un mois et une année</p>
+    </header>
+
+    <main>
+
+        <!-- Formulaire -->
+
+        <form method="POST">
+
+            <label for="mois">Mois</label>
+
+            <select name="mois" id="mois">
+
+                {% for numero in range(1, 13) %}
+
+                    <option value="{{ numero }}"
+                        {% if mois == numero %}selected{% endif %}>
+                        {{ noms_mois[numero - 1] }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label for="annee">Année</label>
+
+            <input
+                type="number"
+                id="annee"
+                name="annee"
+                min="1"
+                max="9999"
+                value="{{ annee }}"
+                required
+            >
+
+            <button type="submit">
+                Afficher le calendrier
+            </button>
+
+        </form>
+
+        <!-- Message d'erreur -->
+
+        {% if erreur %}
+            <p class="erreur">{{ erreur }}</p>
+        {% endif %}
+
+        <!-- Calendrier -->
+
+        {% if calendrier %}
+
+            <section class="resultat">
+
+                <h2>{{ noms_mois[mois - 1] }} {{ annee }}</h2>
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Lun</th>
+                            <th>Mar</th>
+                            <th>Mer</th>
+                            <th>Jeu</th>
+                            <th>Ven</th>
+                            <th>Sam</th>
+                            <th>Dim</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for semaine in calendrier %}
+
+                            <tr>
+
+                                {% for jour in semaine %}
+
+                                    {% if jour == 0 %}
+
+                                        <td></td>
+
+                                    {% else %}
+
+                                        <td {% if jour == 11 and mois == 11 and annee == 2026 %}class="aujourd-hui"{% endif %}>
+                                            {{ jour }}
+                                        </td>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </section>
+
+        {% endif %}
+
+    </main>
+
+</body>
+</html>
